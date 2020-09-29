@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+/usr/bin/env python3
 
 import sys
 import pygame
@@ -75,28 +75,16 @@ def play(board, first):
 
 		print_board(board)
 	else:
-		# first piece
-		r, c = input().split()
-		# validate input
-		while (r not in coords or c not in coords): r, c = input().split()
-		while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
-		
-		row = coords.index(r)
-		col = coords.index(c)
-		if turn%2 == 0: board[row][col] = "X"
-		else: board[row][col] = "O"
-
-		# second piece
-		r, c = input().split()
-		# validate input
-		while (r not in coords or c not in coords): r, c = input().split()
-		while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
-		
-		row = coords.index(r)
-		col = coords.index(c)
-
-		if turn%2 == 0: board[row][col] = "X"
-		else: board[row][col] = "O"
+		for i in range(2):
+			r, c = input().split()
+			# validate input
+			while (r not in coords or c not in coords): r, c = input().split()
+			while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
+			
+			row = coords.index(r)
+			col = coords.index(c)
+			if turn%2 == 0: board[row][col] = "X"
+			else: board[row][col] = "O"
 
 		print_board(board)
 
