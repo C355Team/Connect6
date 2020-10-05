@@ -1,13 +1,13 @@
-/usr/bin/env python3
+#!/usr/bin/env python3
 
 import sys
 import pygame
 import numpy as np
 import math
 
-board = []
-for x in range(19):
-  board.append(["-"] * 19)
+board, length = [], 19
+for x in range(length):
+  board.append(["-"] * length)
 
 coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
 
@@ -35,29 +35,27 @@ first = True
 
 # if anyone knows how to optimize these if statements, please do
 def win_state(board, player):
-	# check horizontal case
-	for c in range(7):
-		for r in range(7):
-			if board[r][c] == player and board[r][c+1] == player and board[r][c+2] == player and board[r][c+3] == player and board[r][c+4] == player and board[r][c+5] == player:
-				return True
-
-	# check vertical case
-	for c in range(7):
-		for r in range(7):
-			if board[r][c] == player and board[r+1][c] == player and board[r+2][c] == player and board[r+3][c] == player and board[r+4][c] == player and board[r+5][c] == player:
-				return True
-
-	# check positive slope case
-	for c in range(7):
-		for r in range(7):
-			if board[r][c] == player and board[r+1][c+1] == player and board[r+2][c+2] == player and board[r+3][c+3] == player and board[r+4][c+4] == player and board[r+5][c+5] == player:
-				return True
-
-	# check negative slope case
-	for c in range(7):
-		for r in range(7):
-			if board[r][c] == player and board[r-1][c+1] == player and board[r-2][c+2] == player and board[r-3][c+3] == player and board[r-4][c+4] == player and board[r-5][c+5] == player:
-				return True
+	winning_state = [player] * 6
+	for c in range(length):
+		for r in range(length):
+		  
+		  # continue checks if current cell is player
+		  if(board[r][c] == player):  
+		    # check horizontal case
+		    if c+5 < length and board[r][c:c+6] == winning_state:
+			    return True
+		    
+		    # check vertical case
+		    if r+5 < length and [board[r+i][c] for i in range(6)] == winning_state:
+			    return True
+		  
+		    # check negative slope case
+		    if r+5 < length and c+5 < length and [board[r+i][c+i] for i in range(6)] == winning_state:
+			    return True
+		    
+		    # check postive slope case
+		    if r-5 > -1 and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
+			    return True
 
 def valid(board, r, c):
 	return board[r][c] == "-"
@@ -90,7 +88,7 @@ def play(board, first):
 
 def num_valid(board):
 	valids = []
-	for i in range(19):
+	for i in range(length):
 		if (valid(board, coords.index(i), coords.index(i))):
 			valids.append(i)
 	return valids
