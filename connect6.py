@@ -49,12 +49,12 @@ def win_state(board, player):
 		    if r+5 < length and [board[r+i][c] for i in range(6)] == winning_state:
 			    return True
 		  
-		    # check postive slope case
+		    # check negative slope case
 		    if r+5 < length and c+5 < length and [board[r+i][c+i] for i in range(6)] == winning_state:
 			    return True
 		    
-		    # check negative slope case
-		    if r-5 < length and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
+		    # check postive slope case
+		    if r-5 > -1 and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
 			    return True
 
 def valid(board, r, c):
