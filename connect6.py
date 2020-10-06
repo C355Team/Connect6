@@ -5,11 +5,23 @@ import pygame
 import numpy as np
 import math
 
-board, length = [], 19
-for x in range(length):
-  board.append(["-"] * length)
 
-coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+## --- Global Variables ---
+turn   = 0 	# even for black, odd for white
+player, computer = '', ''
+stones = ['X', 'O']
+length = 19
+coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+		  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+game_over = False
+## --- End Global Variables ---
+
+
+def initialize_board():
+	board = []
+	for x in range(length):
+  		board.append(["-"] * length)
+	return board
 
 def print_board(board):
 	print("  " + " ".join(coords))
@@ -18,22 +30,45 @@ def print_board(board):
 		print(coords[i] + " " + " ".join(row))
 		i += 1
 
-print_board(board)
-
-# even for black, odd for white
-turn = 0
-game_over = False
-
 def choose():
-	choice = int(input("0 to choose Black, 1 to choose White: "))
+	global turn, player, computer
+	choice = -1
 	# validate input
 	while choice != 0 and choice != 1:
-		choice = int(input("0 to choose Black, 1 to choose White: "))
+		user_input = input("0 to play first, 1 otherwise: ")
+		try:
+			choice = int(user_input)
+		except ValueError:
+			continue
 	turn = choice
+	player = stones[choice]
+	computer = stones[choice-1]
 
-first = True
+def valid(board, r, c):
+	return in_range and empty
 
-# if anyone knows how to optimize these if statements, please do
+def in_range(board, r, c):
+	return r in coords and c in coords
+
+def empty(board, r, c):
+	return board[coords.index(r)][coords.index(c)] == "-"
+
+def play(board, stone):
+	global turn
+	input_accepted = False
+	while(not input_accepted):
+		try:
+			r, c = input("Move (h v): ").split()
+			input_accepted = valid(board, r, c)
+		except ValueError:
+			print("Invalid move. Please try again!")
+			continue
+	row = coords.index(r)
+	col = coords.index(c)
+	board[row][col] = stone
+
+	return board 
+
 def win_state(board, player):
 	winning_state = [player] * 6
 	for c in range(length):
@@ -57,34 +92,13 @@ def win_state(board, player):
 		    if r-5 > -1 and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
 			    return True
 
-def valid(board, r, c):
-	return board[r][c] == "-"
-
-def play(board, first):
-	if first:
-		r, c = input().split()
-		# validate input
-		while (r not in coords or c not in coords): r, c = input().split()
-		while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
-		
-		row = coords.index(r)
-		col = coords.index(c)
-		board[row][col] = "X"
-
-		print_board(board)
-	else:
-		for i in range(2):
-			r, c = input().split()
-			# validate input
-			while (r not in coords or c not in coords): r, c = input().split()
-			while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
-			
-			row = coords.index(r)
-			col = coords.index(c)
-			if turn%2 == 0: board[row][col] = "X"
-			else: board[row][col] = "O"
-
-		print_board(board)
+def winner_exists(board, stone):
+	if win_state(board, stone):
+		if (stone == player):
+			print("\n === YOU WIN! === \n")
+		else:
+			print("\n === Bot wins. Better luck next time! === \n")
+		return True
 
 def num_valid(board):
 	valids = []
@@ -107,21 +121,38 @@ def minimax(board, depth, maximizing_player):
 	# might need to assign separate player and AI variables when assigning turns
 	pass
 
-choose()
+def main():
+	global turn, player, computer
+	# initialization		
+	board = initialize_board()
+	print_board(board)
+	choose()
 
-game_over = False
-
-while not game_over:
-	if turn%2 == 0:
-		play(board, first)
-		turn += 1
+	# actual play
+	x_stone_index = stones.index('X')
+	if turn%2 == x_stone_index:
+		print("-- Player's turn --")
+		board = play(board, player)
 	else:
-		play(board, first)
+		print("-- Computer's turn --")
+		board = play(board, computer)	# TODO: update this line for computer
+
+	while not game_over:
+		print_board(board)
 		turn += 1
-	if win_state(board, "X"):
-		print("Black wins!")
-		game_over = True
-	elif win_state(board, "O"):
-		print("White wins!")
-		game_over = True
-	first = False
+		if turn%2 == x_stone_index:
+			print("-- Player's turn --")
+			board = play(board, player)
+			if winner_exists(board, player): break 
+			board = play(board, player)
+			if winner_exists(board, player): break 
+		else:
+			print("-- Computer's turn --")
+			board = play(board, computer)	# TODO: update this line for computer
+			if winner_exists(board, computer): break 
+			board = play(board, computer)
+			if winner_exists(board, computer): break 
+	print_board(board)
+	turn +=1
+
+main()
