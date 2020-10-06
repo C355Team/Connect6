@@ -5,154 +5,210 @@ import pygame
 import numpy as np
 import math
 
+board, length = [], 19
+for x in range(length):
+  board.append(["-"] * length)
 
-## --- Global Variables ---
-turn   = 0 	# even for black, odd for white
-player, computer = '', ''
-stones = ['X', 'O']
-length = 19
-coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-		  'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
-game_over = False
-## --- End Global Variables ---
-
-
-def initialize_board():
-	board = []
-	for x in range(length):
-  		board.append(["-"] * length)
-	return board
+coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
 
 def print_board(board):
-	print("  " + " ".join(coords))
-	i = 0
-	for row in board:
-		print(coords[i] + " " + " ".join(row))
-		i += 1
+    print("  " + " ".join(coords))
+    i = 0
+    for row in board:
+        print(coords[i] + " " + " ".join(row))
+        i += 1
+
+print_board(board)
+
+# even for black, odd for white
+turn = 0
+game_over = False
 
 def choose():
-	global turn, player, computer
-	choice = -1
-	# validate input
-	while choice != 0 and choice != 1:
-		user_input = input("0 to play first, 1 otherwise: ")
-		try:
-			choice = int(user_input)
-		except ValueError:
-			continue
-	turn = choice
-	player = stones[choice]
-	computer = stones[choice-1]
+    choice = int(input("0 to choose Black, 1 to choose White: "))
+    # validate input
+    while choice != 0 and choice != 1:
+        choice = int(input("0 to choose Black, 1 to choose White: "))
+    turn = choice
+
+first = True
+
+# if anyone knows how to optimize these if statements, please do
+def win_state(board, player):
+    winning_state = [player] * 6
+    for c in range(length):
+        for r in range(length):
+          
+          # continue checks if current cell is player
+          if(board[r][c] == player):  
+            # check horizontal case
+            if c+5 < length and board[r][c:c+6] == winning_state:
+                return True
+            
+            # check vertical case
+            if r+5 < length and [board[r+i][c] for i in range(6)] == winning_state:
+                return True
+          
+            # check negative slope case
+            if r+5 < length and c+5 < length and [board[r+i][c+i] for i in range(6)] == winning_state:
+                return True
+            
+            # check postive slope case
+            if r-5 > -1 and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
+                return True
 
 def valid(board, r, c):
-	return in_range and empty
+    return board[r][c] == "-"
 
-def in_range(board, r, c):
-	return r in coords and c in coords
+def play(board, first):
+    if first:
+        r, c = input().split()
+        # validate input
+        while (r not in coords or c not in coords): r, c = input().split()
+        while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
+        
+        row = coords.index(r)
+        col = coords.index(c)
+        board[row][col] = "X"
 
-def empty(board, r, c):
-	return board[coords.index(r)][coords.index(c)] == "-"
+        print_board(board)
+    else:
+        for i in range(2):
+            r, c = input().split()
+            # validate input
+            while (r not in coords or c not in coords): r, c = input().split()
+            while (not valid(board, coords.index(r), coords.index(c))): r, c = input().split()
+            
+            row = coords.index(r)
+            col = coords.index(c)
+            if turn%2 == 0: board[row][col] = "X"
+            else: board[row][col] = "O"
 
-def play(board, stone):
-	global turn
-	input_accepted = False
-	while(not input_accepted):
-		try:
-			r, c = input("Move (h v): ").split()
-			input_accepted = valid(board, r, c)
-		except ValueError:
-			print("Invalid move. Please try again!")
-			continue
-	row = coords.index(r)
-	col = coords.index(c)
-	board[row][col] = stone
-
-	return board 
-
-def win_state(board, player):
-	winning_state = [player] * 6
-	for c in range(length):
-		for r in range(length):
-		  
-		  # continue checks if current cell is player
-		  if(board[r][c] == player):  
-		    # check horizontal case
-		    if c+5 < length and board[r][c:c+6] == winning_state:
-			    return True
-		    
-		    # check vertical case
-		    if r+5 < length and [board[r+i][c] for i in range(6)] == winning_state:
-			    return True
-		  
-		    # check negative slope case
-		    if r+5 < length and c+5 < length and [board[r+i][c+i] for i in range(6)] == winning_state:
-			    return True
-		    
-		    # check postive slope case
-		    if r-5 > -1 and c+5 < length and [board[r-i][c+i] for i in range(6)] == winning_state:
-			    return True
-
-def winner_exists(board, stone):
-	if win_state(board, stone):
-		if (stone == player):
-			print("\n === YOU WIN! === \n")
-		else:
-			print("\n === Bot wins. Better luck next time! === \n")
-		return True
+        print_board(board)
 
 def num_valid(board):
-	valids = []
-	for i in range(length):
-		if (valid(board, coords.index(i), coords.index(i))):
-			valids.append(i)
-	return valids
+    valids = []
+    for i in range(length):
+        if (valid(board, coords.index(i), coords.index(i))):
+            valids.append(i)
+    return valids
 
 def is_terminal(board):
-	return win_state(board, player) or len(num_valid(board)) == 0
+    return win_state(board, player) or len(num_valid(board)) == 0
+
+def score(board, player):
+    points = 0
+    for c in range(length):
+        for r in range(length):
+              # continue checks if current cell is player
+            if(board[r][c] == player):  
+                # check horizontal case
+                if c < length and board[r][c:c+5] == [player]*5:
+                    points = 5
+                    break
+                elif c < length and board[r][c:c+4] == [player]*4:
+                    points = 4
+                    break
+                elif c < length and board[r][c:c+3] == [player]*3:
+                    points = 3
+                    break
+                elif c < length and board[r][c:c+2] == [player]*2:
+                    points = 2
+                    break
+                elif c < length and board[r][c:c+1] == [player]:
+                    points = 1
+                    break
+
+                # check vertical case
+                if r < length and [board[r+i][c] for i in range(5)] == [player]*5:
+                    points = 5
+                    break
+                elif r < length and [board[r+i][c] for i in range(4)] == [player]*4:
+                    points = 4
+                    break
+                elif r < length and [board[r+i][c] for i in range(3)] == [player]*3:
+                    points = 3
+                    break
+                elif r < length and [board[r+i][c] for i in range(2)] == [player]*2:
+                    points = 2
+                    break
+                elif r < length and [board[r+i][c] for i in range(4)] == [player]*1:
+                    points = 1
+                    break
+              
+                # check negative slope case
+                if r < length and c < length and [board[r+i][c+i] for i in range(5)] == [player]*5:
+                    points = 5
+                    break
+                elif r < length and c < length and [board[r+i][c+i] for i in range(4)] == [player]*4:
+                    points = 4
+                    break
+                elif r < length and c < length and [board[r+i][c+i] for i in range(3)] == [player]*3:
+                    points = 3
+                    break
+                elif r < length and c < length and [board[r+i][c+i] for i in range(2)] == [player]*2:
+                    points = 2
+                    break
+                elif r < length and c < length and [board[r+i][c+i] for i in range(1)] == [player]*1:
+                    points = 1
+                    break
+                
+                # check postive slope case
+                if r > -1 and c < length and [board[r-i][c+i] for i in range(5)] == [player]*5:
+                    points = 5
+                    break
+                elif r > -1 and c < length and [board[r-i][c+i] for i in range(4)] == [player]*4:
+                    points = 4
+                    break
+                elif r > -1 and c < length and [board[r-i][c+i] for i in range(3)] == [player]*3:
+                    points = 3
+                    break
+                elif r > -1 and c < length and [board[r-i][c+i] for i in range(2)] == [player]*2:
+                    points = 2
+                    break
+                elif r > -1 and c < length and [board[r-i][c+i] for i in range(1)] == [player]*1:
+                    points = 1
+                    break
+        break
+
+    return points
 
 def minimax(board, depth, maximizing_player):
-	valids = num_valid(board)
-	terminal = is_terminal(board)
-	if depth == 0 or terminal:
-		# "heuristic value of node"
-		pass
-	# maximizing player case
-	# minimizing player case
-	# might need to assign separate player and AI variables when assigning turns
-	pass
+    valids = num_valid(board)
+    terminal = is_terminal(board)
+    if depth == 0:
+        # return score() for computer - score() for player
+        pass
+    elif terminal:
+        # if one of them wins, return big # for computer, small # for player
+        # if game over / no more valid moves, return 0
+        pass
+    # maximizing player case
+    if maximizing_player:
+        pass
+    # minimizing player case
+    else:
+        pass
+    # might need to assign separate player and AI variables when assigning turns
+    pass
 
-def main():
-	global turn, player, computer
-	# initialization		
-	board = initialize_board()
-	print_board(board)
-	choose()
+choose()
 
-	# actual play
-	x_stone_index = stones.index('X')
-	if turn%2 == x_stone_index:
-		print("-- Player's turn --")
-		board = play(board, player)
-	else:
-		print("-- Computer's turn --")
-		board = play(board, computer)	# TODO: update this line for computer
+game_over = False
 
-	while not game_over:
-		print_board(board)
-		turn += 1
-		if turn%2 == x_stone_index:
-			print("-- Player's turn --")
-			board = play(board, player)
-			if winner_exists(board, player): break 
-			board = play(board, player)
-			if winner_exists(board, player): break 
-		else:
-			print("-- Computer's turn --")
-			board = play(board, computer)	# TODO: update this line for computer
-			if winner_exists(board, computer): break 
-			board = play(board, computer)
-			if winner_exists(board, computer): break 
-	print_board(board)
-	turn +=1
-
-main()
+while not game_over:
+    print(score(board, "X"))
+    print(score(board, "O"))
+    if turn%2 == 0:
+        play(board, first)
+        turn += 1
+    else:
+        play(board, first)
+        turn += 1
+    if win_state(board, "X"):
+        print("Black wins!")
+        game_over = True
+    elif win_state(board, "O"):
+        print("White wins!")
+        game_over = True
+    first = False
