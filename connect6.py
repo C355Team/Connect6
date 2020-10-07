@@ -45,7 +45,7 @@ def choose():
 	computer = stones[choice-1]
 
 def valid(board, r, c):
-	return in_range and empty
+	return in_range(board, r, c) and empty(board, r, c)
 
 def in_range(board, r, c):
 	return r in coords and c in coords
