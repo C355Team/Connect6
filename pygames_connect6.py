@@ -39,7 +39,6 @@ print_board(board)
 
 def win_state(board, player):
     winning_state = [player] * 6
-    print(winning_state)
     for c in range(length):
         for r in range(length):
 
@@ -60,6 +59,42 @@ def win_state(board, player):
             # check postive slope case
             if r-5 > -1 and c+5 < length and [board[c+i][r-i] for i in range(6)] == winning_state:
                 return True
+
+def horiz_score(board, player, max_length, blanks_around):
+    for i in range(length):
+        row = board[i]
+        in_a_row = 0
+        blanks = 0
+
+        for j in row:
+            print(j)
+            if row == "-":
+                blank += 1
+            elif row == player:
+                print("here")
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blank = 0
+
+            if in_a_row == 6:
+                score = 6
+                return score
+            
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+        in_a_row = 0
+        blanks = 0
+
+    return max_length, blanks_around
+
+def max_score(board, player, max_length, blanks_around):
+    max_length, blanks_around = horiz_score(board, player, max_length, blanks_around)
+
+max_length = 0
+blanks_around = 0
 
 while run:
     
@@ -83,7 +118,9 @@ while run:
                     Red = True
                     break
                 turn+=1
-                print(turn)
+                # print(turn)
+                print_board(board)
+                max_score(board, "X", max_length, blanks_around)
             elif turn > 0: #player 2
                 pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
                 board[c][r] = "O"
@@ -91,11 +128,11 @@ while run:
                     Yellow = True
                     break
                 turn+=1
-                print(turn)
+                # print(turn)
+                print_board(board)
                 if turn >= 3:
                     turn-=4
 
-        print_board(board)
         pygame.display.update()
     if Red:
         print("Red wins")
