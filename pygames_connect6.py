@@ -215,7 +215,22 @@ def max_score(board, player, max_length, blanks_around):
     up_diag_max, up_diag_blanks = up_diag_score(board, player, max_length, blanks_around)
     # top left to bottom right
     down_diag_max, down_diag_blanks = down_diag_score(board, player, max_length, blanks_around)
-    print(down_diag_max, down_diag_blanks)
+    
+    if horiz_max >= vert_max:
+        if horiz_max >= up_diag_max:
+            if horiz_max >= down_diag_max:
+                print(horiz_max, horiz_blanks)
+                return horiz_max, horiz_blanks
+    elif vert_max >= up_diag_max:
+            if vert_max >= down_diag_max:
+                print(vert_max, vert_blanks)
+                return vert_max, vert_blanks
+    elif up_diag_max >= down_diag_max:
+        print(up_diag_max, up_diag_blanks)
+        return up_diag_max, up_diag_blanks
+    else:
+        print(down_diag_max, down_diag_blanks)
+        return down_diag_max, down_diag_blanks
 
 while run:
     
