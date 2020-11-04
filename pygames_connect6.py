@@ -19,6 +19,9 @@ length = 19
 coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
           'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
 
+max_length = 0
+blanks_around = 0
+
 def initialize_board():
     board = []
     for x in range(length):
@@ -73,12 +76,61 @@ def horiz_score(board, player, max_length, blanks_around):
                 in_a_row += 1
             else:
                 in_a_row = 0
-                blank = 0
+                blanks = 0
 
             if in_a_row == 6:
-                score = 6
-                return score
+                return 6, 0
             
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+    return max_length, blanks_around
+
+def vert_score(board, player, max_length, blanks_around):
+    for i in range(length):
+        in_a_row = 0
+        blanks = 0
+
+        for j in range(length):
+            if board[j][i] == "-":
+                blanks += 1
+            elif board[j][i] == player:
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blanks = 0
+
+            if in_a_row == 6:
+                return 6, 0
+
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+    return max_length, blanks_around
+
+def up_diag_score(board, player, max_length, blanks_around):
+    in_a_row = 0
+    blanks = 0
+
+    for i in range(length*2):
+        for j in range(i):
+            index = i-j
+
+            if index < length and j < length:
+                tile = board[index][j]
+                if tile == "-":
+                    blanks += 1
+                elif tile == player:
+                    in_a_row += 1
+                else:
+                    in_a_row = 0
+                    blanks = 0
+
+                if in_a_row == 6:
+                    return 6, 0
+
             if in_a_row >= max_length:
                 max_length = in_a_row
                 blanks_around = blanks
@@ -88,11 +140,45 @@ def horiz_score(board, player, max_length, blanks_around):
 
     return max_length, blanks_around
 
-def max_score(board, player, max_length, blanks_around):
-    max_length, blanks_around = horiz_score(board, player, max_length, blanks_around)
+def down_diag_score(board, player, max_length, blanks_around):
+    in_a_row = 0
+    blanks = 0
 
-max_length = 0
-blanks_around = 0
+    for i in range(length*2):
+        for j in range(i):
+            index = i-j
+
+            if index < length and j < length:
+                tile = board[j][index]
+                if tile == "-":
+                    blanks += 1
+                elif tile == player:
+                    in_a_row += 1
+                else:
+                    in_a_row = 0
+                    blanks = 0
+
+                if in_a_row == 6:
+                    return 6, 0
+
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+        in_a_row = 0
+        blanks = 0
+
+    return max_length, blanks_around
+
+
+def max_score(board, player, max_length, blanks_around):
+    horiz_max, horiz_blanks = horiz_score(board, player, max_length, blanks_around)
+    vert_max, vert_blanks = vert_score(board, player, max_length, blanks_around)
+    # bottom left to top right
+    up_diag_max, up_diag_blanks = up_diag_score(board, player, max_length, blanks_around)
+    # top left to bottom right
+    down_diag_max, down_diag_blanks = down_diag_score(board, player, max_length, blanks_around)
+    print(down_diag_max, down_diag_blanks)
 
 while run:
     
@@ -119,6 +205,7 @@ while run:
                 # print(turn)
                 print_board(board)
                 max_score(board, "X", max_length, blanks_around)
+                # up_diag_score(board, "X", max_length, blanks_around)
             elif turn > 0: #player 2
                 pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
                 board[c][r] = "O"
@@ -128,6 +215,7 @@ while run:
                 turn+=1
                 # print(turn)
                 print_board(board)
+                max_score(board, "O", max_length, blanks_around)
                 if turn >= 3:
                     turn-=4
 
