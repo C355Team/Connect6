@@ -111,62 +111,54 @@ def vert_score(board, player, max_length, blanks_around):
     return max_length, blanks_around
 
 def up_diag_score(board, player, max_length, blanks_around):
-    in_a_row = 0
-    blanks = 0
+    up_diagonals =  [[board[length - p + q - 1][q]
+             for q in range(max(p-length+1, 0), min(p+1, length))]
+            for p in range(length + length - 1)]
 
-    for i in range(length*2):
-        for j in range(i):
-            index = i-j
+    for diagonal in up_diagonals:
+        in_a_row = 0
+        blanks = 0
+        for j in diagonal:
+            if j == "-":
+                blanks += 1
+            elif j == player:
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blank = 0
 
-            if index < length and j < length:
-                tile = board[index][j]
-                if tile == "-":
-                    blanks += 1
-                elif tile == player:
-                    in_a_row += 1
-                else:
-                    in_a_row = 0
-                    blanks = 0
-
-                if in_a_row == 6:
-                    return 6, 0
-
+            if in_a_row == 6:
+                return 6, 0
+            
             if in_a_row >= max_length:
                 max_length = in_a_row
                 blanks_around = blanks
-
-        in_a_row = 0
-        blanks = 0
 
     return max_length, blanks_around
 
 def down_diag_score(board, player, max_length, blanks_around):
-    in_a_row = 0
-    blanks = 0
+    down_diagonals = [[board[p - q][q]
+             for q in range(max(p-length+1,0), min(p+1, length))]
+            for p in range(length + length - 1)]
 
-    for i in range(length*2):
-        for j in range(i):
-            index = i-j
+    for diagonal in down_diagonals:
+        in_a_row = 0
+        blanks = 0
+        for j in diagonal:
+            if j == "-":
+                blanks += 1
+            elif j == player:
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blank = 0
 
-            if index < length and j < length:
-                tile = board[j][index]
-                if tile == "-":
-                    blanks += 1
-                elif tile == player:
-                    in_a_row += 1
-                else:
-                    in_a_row = 0
-                    blanks = 0
-
-                if in_a_row == 6:
-                    return 6, 0
-
+            if in_a_row == 6:
+               return 6, 0
+            
             if in_a_row >= max_length:
                 max_length = in_a_row
                 blanks_around = blanks
-
-        in_a_row = 0
-        blanks = 0
 
     return max_length, blanks_around
 
