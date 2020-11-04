@@ -61,8 +61,7 @@ def win_state(board, player):
                 return True
 
 def horiz_score(board, player, max_length, blanks_around):
-    for i in range(length):
-        row = board[i]
+    for row in board:
         in_a_row = 0
         blanks = 0
 
@@ -88,8 +87,76 @@ def horiz_score(board, player, max_length, blanks_around):
 
     return max_length, blanks_around
 
+def vertical_score(board, player, max_length, blanks_around):
+    for col_index in range(length):
+        column = ""
+        for row in board:
+            column += row[col_index]
+
+        in_a_row = 0
+        blanks = 0
+        for j in column:
+            if j == "-":
+                blanks += 1
+            elif j == player:
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blank = 0
+
+            if in_a_row == 6:
+                score = 6
+                return score
+            
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+        in_a_row = 0
+        blanks = 0
+    
+    return max_length, blanks_around
+
+def diagonal_score(board, player, max_length, blanks_around):
+    right_to_left_diagonals =  [[board[length - p + q - 1][q]
+             for q in range(max(p-length+1, 0), min(p+1, length))]
+            for p in range(length + length - 1)]
+
+    left_to_right_diagonals = [[board[p - q][q]
+             for q in range(max(p-length+1,0), min(p+1, length))]
+            for p in range(length + length - 1)]
+    
+    diagonals = right_to_left_diagonals + left_to_right_diagonals
+
+    in_a_row = 0
+    blanks = 0
+    for diagonal in diagonals:
+        for j in diagonal:
+            if j == "-":
+                blanks += 1
+            elif j == player:
+                in_a_row += 1
+            else:
+                in_a_row = 0
+                blank = 0
+
+            if in_a_row == 6:
+                score = 6
+                return score
+            
+            if in_a_row >= max_length:
+                max_length = in_a_row
+                blanks_around = blanks
+
+        in_a_row = 0
+        blanks = 0
+
+    return max_length, blanks_around
+
 def max_score(board, player, max_length, blanks_around):
     max_length, blanks_around = horiz_score(board, player, max_length, blanks_around)
+    max_length, blanks_around = vertical_score(board, player, max_length, blanks_around)
+    max_length, blanks_around = diagonal_score(board, player, max_length, blanks_around)
 
 max_length = 0
 blanks_around = 0
