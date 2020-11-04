@@ -111,8 +111,8 @@ def vert_score(board, player, max_length, blanks_around):
     return max_length, blanks_around
 
 def up_diag_score(board, player, max_length, blanks_around):
-    up_diagonals =  [[board[length - p + q - 1][q]
-             for q in range(max(p-length+1, 0), min(p+1, length))]
+    up_diagonals =  [[board[p - q][q]
+             for q in range(max(p-length+1,0), min(p+1, length))]
             for p in range(length + length - 1)]
 
     for diagonal in up_diagonals:
@@ -137,8 +137,8 @@ def up_diag_score(board, player, max_length, blanks_around):
     return max_length, blanks_around
 
 def down_diag_score(board, player, max_length, blanks_around):
-    down_diagonals = [[board[p - q][q]
-             for q in range(max(p-length+1,0), min(p+1, length))]
+    down_diagonals = [[board[length - p + q - 1][q]
+             for q in range(max(p-length+1, 0), min(p+1, length))]
             for p in range(length + length - 1)]
 
     for diagonal in down_diagonals:
