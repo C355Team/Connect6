@@ -67,11 +67,9 @@ def horiz_score(board, player, max_length, blanks_around):
         blanks = 0
 
         for j in row:
-            print(j)
-            if row == "-":
-                blank += 1
-            elif row == player:
-                print("here")
+            if j == "-":
+                blanks += 1
+            elif j == player:
                 in_a_row += 1
             else:
                 in_a_row = 0
