@@ -111,15 +111,15 @@ def vert_score(board, player, max_length, blanks_around):
     return max_length, blanks_around
 
 def up_diag_score(board, player, max_length, blanks_around):
-    in_a_row = 0
-    blanks = 0
-
-    for i in range(length*2):
-        for j in range(i):
-            index = i-j
-
-            if index < length and j < length:
-                tile = board[index][j]
+    for sum in range(length*2-1):
+        #print('Sum', sum)           # Leave this line for debugging
+        in_a_row = 0
+        blanks = 0
+        for j in range(sum+1):
+            i = sum-j
+            if (i<length and j<length):
+                tile = board[i][j]
+                #print(i, j, tile)   # Leave this line for debugging
                 if tile == "-":
                     blanks += 1
                 elif tile == player:
@@ -128,28 +128,25 @@ def up_diag_score(board, player, max_length, blanks_around):
                     in_a_row = 0
                     blanks = 0
 
-                if in_a_row == 6:
+            if in_a_row == 6:
                     return 6, 0
-
+        
             if in_a_row >= max_length:
                 max_length = in_a_row
                 blanks_around = blanks
-
-        in_a_row = 0
-        blanks = 0
 
     return max_length, blanks_around
 
 def down_diag_score(board, player, max_length, blanks_around):
-    in_a_row = 0
-    blanks = 0
-
-    for i in range(length*2):
-        for j in range(i):
-            index = i-j
-
-            if index < length and j < length:
-                tile = board[j][index]
+    for sum in range(length*-1+1, length, 1):
+        #print('Sum', sum)           # Leave this line for debugging
+        in_a_row = 0
+        blanks = 0
+        for j in range(length):
+            i = j-sum
+            if (i>= 0 and i<length and j<length):
+                tile = board[i][j]
+                #print(i, j, tile)   # Leave this line for debugging
                 if tile == "-":
                     blanks += 1
                 elif tile == player:
@@ -158,15 +155,12 @@ def down_diag_score(board, player, max_length, blanks_around):
                     in_a_row = 0
                     blanks = 0
 
-                if in_a_row == 6:
+            if in_a_row == 6:
                     return 6, 0
-
+        
             if in_a_row >= max_length:
                 max_length = in_a_row
                 blanks_around = blanks
-
-        in_a_row = 0
-        blanks = 0
 
     return max_length, blanks_around
 
@@ -205,7 +199,10 @@ while run:
                 # print(turn)
                 print_board(board)
                 max_score(board, "X", max_length, blanks_around)
-                # up_diag_score(board, "X", max_length, blanks_around)
+                print("UP", up_diag_score(board, "X", max_length, blanks_around))
+                print("DOWN", down_diag_score(board, "X", max_length, blanks_around))
+                print("Ver", vert_score(board, "X", max_length, blanks_around))
+                print("Hor", horiz_score(board, "X", max_length, blanks_around))
             elif turn > 0: #player 2
                 pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
                 board[c][r] = "O"
@@ -216,6 +213,10 @@ while run:
                 # print(turn)
                 print_board(board)
                 max_score(board, "O", max_length, blanks_around)
+                print("UP", up_diag_score(board, "X", max_length, blanks_around))
+                print("DOWN", down_diag_score(board, "X", max_length, blanks_around))
+                print("Ver", vert_score(board, "X", max_length, blanks_around))
+                print("Hor", horiz_score(board, "X", max_length, blanks_around))
                 if turn >= 3:
                     turn-=4
 
