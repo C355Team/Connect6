@@ -245,7 +245,7 @@ def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
     # if is_max_player:
         # return get_max()
     # else:
-    #     player
+    #     player?
 
 def get_min(board, player, max_depth, alpha, beta, turn):
     best = sys.maxsize
