@@ -190,30 +190,6 @@ def print_all_scores(board, player, max_length, blanks_around):
     print("Ver", vert_score(board, player, max_length, blanks_around))
     print("Hor", horiz_score(board, player, max_length, blanks_around))
 
-def score_util(board, player, is_max_player, max_length, blanks_around):
-    util = 0
-    max_length, blanks_around = max_score(board, player, max_length, blanks_around)
-    can_win = max_length + blanks_around >= 6
-
-    if can_win:
-        if max_length == 6:
-            util = 500
-        elif max_length == 5:
-            util = 50
-        elif max_length == 4:
-            util = 40
-        elif max_length == 3:
-            util = 30
-        elif max_length == 2:
-            util = 2
-        elif max_length == 1:
-            util = 10
-
-    if not is_max_player:
-        util *= -1
-
-    return util
-
 # check available moves
 
 def in_range(board, r, c):
@@ -232,44 +208,6 @@ def num_valid(board):
             if (valid(board, coords[i], coords[j])):
                 valids.append((i, j))
     return valids
-
-# two recursive functions
-
-best_move_x = 0
-best_move_y = 0
-
-def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
-    if win_state(board, "X") or win_state(board, "O") or depth == max_depth:
-        return score_util(board, player, is_max_player, max_length, blanks_around)
-
-    # if is_max_player:
-        # return get_max()
-    # else:
-    #     player?
-
-def get_min(board, player, max_depth, alpha, beta, turn):
-    best = sys.maxsize
-    is_max_player = True
-
-    for move in num_valid(board):
-        if turn > 0: # player 2
-            is_max_player = False
-
-        copied_board = board.copy()
-        copied_board[move[0]][move[1]] = player
-
-        val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
-        if val < best:
-            best = val
-            best_move_x = move[0]
-            best_move_y = move[1]
-
-        alpha = math.max(alpha, best)
-
-        if beta <= alpha:
-            break
-
-    return best
 
 while run:
     
