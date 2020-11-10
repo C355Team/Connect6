@@ -1,6 +1,7 @@
 import pygame
 import math
 import sys
+import copy
 
 pygame.init()
 
@@ -237,7 +238,7 @@ def num_valid(board):
 
 best_move_x = 0
 best_move_y = 0
-max_depth = 3
+max_depth = 1
 
 def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
     if win_state(board, "X") or win_state(board, "O") or depth == max_depth:
@@ -249,6 +250,7 @@ def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
         return get_min(board, player, max_depth, depth, alpha, beta, turn)
 
 def get_min(board, player, max_depth, depth, alpha, beta, turn):
+    global best_move_x, best_move_y
     best = sys.maxsize
     is_max_player = True
 
@@ -256,7 +258,7 @@ def get_min(board, player, max_depth, depth, alpha, beta, turn):
         if turn > 0: # player 2
             is_max_player = False
 
-        copied_board = board.copy()
+        copied_board = copy.deepcopy(board)
         copied_board[move[0]][move[1]] = player
 
         val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
@@ -269,32 +271,33 @@ def get_min(board, player, max_depth, depth, alpha, beta, turn):
 
         if beta <= alpha:
             break
-
+    
     return best
 
 def get_max(board, player, max_depth, depth, alpha, beta, turn):
-	best = -sys.maxsize - 1
-	is_max_player = False
+    global best_move_x, best_move_y
+    best = -sys.maxsize - 1
+    is_max_player = False
 
-	for move in num_valid(board):
-		if turn > 0:
-			is_max_player = True
+    for move in num_valid(board):
+            if turn > 0:
+                is_max_player = True
 
-		copied_board = board.copy()
-		copied_board[move[0]][move[1]] = player
+            copied_board = copy.deepcopy(board)
+            copied_board[move[0]][move[1]] = player
 
-		val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
-		if val > best:
-			best = val
-			best_move_x = move[0]
-			best_move_y = move[1]
+            val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
+            if val > best:
+                best = val
+                best_move_x = move[0]
+                best_move_y = move[1]
 
-		alpha = max(alpha, best)
+            alpha = max(alpha, best)
 
-		if beta <= alpha:
-			break
+            if beta <= alpha:
+                    break
 
-	return best
+    return best
 
 while run:
     
@@ -306,13 +309,13 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #when user clicks on the x, terminate program
             run = False
-        if event.type == pygame.MOUSEBUTTONUP:
-            position = pygame.mouse.get_pos() #get click pos coordinate
-            r = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
-            c = math.floor(position[1]/50) #translate coordinate from pixel to rows 0-18
-            print ('Coordinate Selected:' + '(' + str(r) + ',' + str(c) + ')') #for diagnostic purposes
-            if ((c, r)) in num_valid(board):       
-                if turn <= 0: #starting first gives one tile, then all subsequent turns gets 2 tiles
+        if turn <= 0:
+            if event.type == pygame.MOUSEBUTTONUP:
+                position = pygame.mouse.get_pos() #get click pos coordinate
+                r = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
+                c = math.floor(position[1]/50) #translate coordinate from pixel to rows 0-18
+                print ('Coordinate Selected:' + '(' + str(r) + ',' + str(c) + ')') #for diagnostic purposes
+                if ((c, r)) in num_valid(board):       
                     pygame.draw.rect(WIN, (255,0,0), (r*50,c*50,45,45), 0) #red tile
                     board[c][r] = "X"
                     if win_state(board, "X"):
@@ -324,23 +327,24 @@ while run:
                     
                     print_all_scores(board, "X", max_length, blanks_around)
                     
-                elif turn > 0: #player 2
-                	# pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
-                    min_max(board, "O", max_depth, 0, -1000, 1000, True, turn)
-                    board[best_move_x][best_move_y] = "O"
-                    pygame.draw.rect(WIN, (204,204,0),(best_move_x*50,best_move_y*50,45,45), 0)
-                    # board[c][r] = "O"
-                    if win_state(board, "O"):
-                        Yellow = True
-                        break
-                    turn+=1
-                    # print(turn)
-                    print_board(board)
+        else: #player 2
+            # pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
+            min_max(board, "O", max_depth, 0, -1000, 1000, True, turn)
+            board[best_move_x][best_move_y] = "O"
+            pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0)
+            best_move_x, best_move_y = 0, 0
+            # board[c][r] = "O"
+            if win_state(board, "O"):
+                Yellow = True
+                break
+            turn+=1
+            # print(turn)
+            print_board(board)
 
-                    print_all_scores(board, "O", max_length, blanks_around)
+            print_all_scores(board, "O", max_length, blanks_around)
 
-                    if turn >= 3:
-                        turn-=4
+            if turn >= 3:
+                turn-=4
 
         pygame.display.update()
     if Red:
