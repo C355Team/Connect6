@@ -194,11 +194,13 @@ def print_all_scores(board, player, max_length, blanks_around):
 def score_util(board, player, is_max_player, max_length, blanks_around):
     util = 0
     max_length, blanks_around = max_score(board, player, max_length, blanks_around)
+    max_length_opp, blanks_around_opp = max_score(board, "X", max_length, blanks_around)
     can_win = max_length + blanks_around >= 6
+    opp_can_win = max_length_opp + blanks_around_opp >= 6
 
     if can_win:
         if max_length == 6:
-            util = 500
+            util = 1000
         elif max_length == 5:
             util = 50
         elif max_length == 4:
@@ -206,9 +208,19 @@ def score_util(board, player, is_max_player, max_length, blanks_around):
         elif max_length == 3:
             util = 30
         elif max_length == 2:
-            util = 2
+            util = 20
         elif max_length == 1:
             util = 10
+    
+    if opp_can_win:
+        if max_length_opp == 6:
+            util = -500 if 500 > util else util
+        elif max_length_opp == 5:
+            util = -55 if 55 > util else util
+        elif max_length_opp == 4:
+            util = -45 if 45 > util else util
+        elif max_length_opp == 3:
+            util = -35 if 35 > util else util
 
     if not is_max_player:
         util *= -1
@@ -241,6 +253,7 @@ best_move_y = 0
 max_depth = 1
 
 def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
+    global max_length, blanks_around
     if win_state(board, "X") or win_state(board, "O") or depth == max_depth:
         return score_util(board, player, is_max_player, max_length, blanks_around)
 
