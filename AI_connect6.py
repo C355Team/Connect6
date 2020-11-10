@@ -345,7 +345,6 @@ while run:
             min_max(board, "O", max_depth, 0, -1000, 1000, True, turn)
             board[best_move_x][best_move_y] = "O"
             pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0)
-            best_move_x, best_move_y = 0, 0
             # board[c][r] = "O"
             if win_state(board, "O"):
                 Yellow = True
