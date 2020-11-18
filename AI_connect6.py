@@ -1,7 +1,7 @@
 import pygame
 import math
 import sys
-import copy
+from random import randrange
 
 pygame.init()
 
@@ -181,7 +181,10 @@ def max_score(board, player, max_length, blanks_around):
     for a_tuple in [vert, up_diag, down_diag]:
         if a_tuple[0]>max_tuple[0]:
             max_tuple = a_tuple
-    
+        elif a_tuple[0]==max_tuple[0]:
+            if a_tuple[1]>max_tuple[1]:
+                max_tuple = a_tuple
+    print_board(board)  # for debugging only
     print("MAX SCORE:", max_tuple)
     return max_tuple
 
@@ -191,12 +194,12 @@ def print_all_scores(board, player, max_length, blanks_around):
     print("Ver", vert_score(board, player, max_length, blanks_around))
     print("Hor", horiz_score(board, player, max_length, blanks_around))
 
-def score_util(board, player, is_max_player, max_length, blanks_around):
+def score_util(board, player, max_length, blanks_around):
     util = 0
     max_length, blanks_around = max_score(board, player, max_length, blanks_around)
-    max_length_opp, blanks_around_opp = max_score(board, "X", max_length, blanks_around)
-    can_win = max_length + blanks_around >= 6
-    opp_can_win = max_length_opp + blanks_around_opp >= 6
+    max_length_opp, blanks_around_opp = max_score(board, opponent(player), max_length, blanks_around)
+    can_win = (max_length + blanks_around) >= 6
+    opp_can_win = (max_length_opp + blanks_around_opp) >= 6
 
     if can_win:
         if max_length == 6:
@@ -222,11 +225,6 @@ def score_util(board, player, is_max_player, max_length, blanks_around):
         elif max_length_opp == 3:
             util = -35 if 35 > util else util
 
-    if not is_max_player:
-        util *= -1
-
-    return util
-
 # check available moves
 
 def in_range(board, r, c):
@@ -246,71 +244,56 @@ def num_valid(board):
                 valids.append((i, j))
     return valids
 
-# two recursive functions
+def random_move(board):
+    global best_move_x, best_move_y
+
+    valids = num_valid(board)
+    random_move = valids[randrange(len(valids))]
+    best_move_x = random_move[0]
+    best_move_y = random_move[1]
+
+def opponent(player):
+    if player == 'X':
+        return 'O'
+    else:
+        return 'X'
 
 best_move_x = 0
 best_move_y = 0
-max_depth = 1
 
-def min_max(board, player, max_depth, depth, alpha, beta, is_max_player, turn):
-    global max_length, blanks_around
+def ab_negamax(board, player, depth, max_depth, alpha, beta):
+    global best_move_x, best_move_y, max_length, blanks_around
+
+    # previous move created win
     if win_state(board, "X") or win_state(board, "O") or depth == max_depth:
-        return score_util(board, player, is_max_player, max_length, blanks_around)
-
-    if is_max_player:
-        return get_max(board, player, max_depth, depth, alpha, beta, turn)
-    else:
-        return get_min(board, player, max_depth, depth, alpha, beta, turn)
-
-def get_min(board, player, max_depth, depth, alpha, beta, turn):
-    global best_move_x, best_move_y
-    best = sys.maxsize
-    is_max_player = True
-
-    for move in num_valid(board):
-        if turn > 0: # player 2
-            is_max_player = False
-
-        copied_board = copy.deepcopy(board)
-        copied_board[move[0]][move[1]] = player
-
-        val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
-        if val < best:
-            best = val
+        max_length_copy = max_length
+        blanks_around_copy = blanks_around
+        score_util(board, player, max_length, blanks_around)
+        max_tuple = max_score(board, player, max_length_copy, blanks_around_copy)
+        return max_tuple[0] + max_tuple[1]
+    
+    # board full, tie
+    moves = num_valid(board)
+    if len(moves) == 0:
+        return 0
+    
+    best = -sys.maxsize
+    new_board = board
+    for move in moves:
+        new_board[move[0]][move[1]] = player
+        v = ab_negamax(new_board, opponent(player), depth+1, max_depth, -alpha, -beta)
+        best = max(best, -v)
+        if best == -v:
             best_move_x = move[0]
             best_move_y = move[1]
 
+        new_board[move[0]][move[1]] = '-'   # reset board to original
         alpha = max(alpha, best)
-
-        if beta <= alpha:
+        if alpha >= beta:
             break
-    
-    return best
-
-def get_max(board, player, max_depth, depth, alpha, beta, turn):
-    global best_move_x, best_move_y
-    best = -sys.maxsize - 1
-    is_max_player = False
-
-    for move in num_valid(board):
-            if turn > 0:
-                is_max_player = True
-
-            copied_board = copy.deepcopy(board)
-            copied_board[move[0]][move[1]] = player
-
-            val = min_max(copied_board, player, max_depth, depth+1, alpha, beta, is_max_player, turn+1)
-            if val > best:
-                best = val
-                best_move_x = move[0]
-                best_move_y = move[1]
-
-            alpha = max(alpha, best)
-
-            if beta <= alpha:
-                    break
 
     return best
+
 
 while run:
     
@@ -341,11 +324,10 @@ while run:
                     print_all_scores(board, "X", max_length, blanks_around)
                     
         else: #player 2
-            # pygame.draw.rect(WIN, (204,204,0),(r*50,c*50,45,45), 0) #yellow tile
-            min_max(board, "O", max_depth, 0, -1000, 1000, True, turn)
+            # random_move(board)
+            ab_negamax(board, 'O', 0, 1, -1000, 1000)   # board, player, depth, max_depth, alpha, beta
             board[best_move_x][best_move_y] = "O"
-            pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0)
-            # board[c][r] = "O"
+            pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0) #yellow tile
             if win_state(board, "O"):
                 Yellow = True
                 break
