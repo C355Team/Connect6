@@ -21,9 +21,6 @@ length = 19
 coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
           'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
 
-max_length = 0
-blanks_around = 0
-
 def initialize_board():
     board = []
     for x in range(length):
@@ -65,117 +62,86 @@ def win_state(board, player):
             if r-5 > -1 and c+5 < length and [board[c+i][r-i] for i in range(6)] == winning_state:
                 return True
 
-def horiz_score(board, player, max_length, blanks_around):
+def horiz_score(board, player):
+
+    max_length, blanks_around = 0, 0
+    for row in board:       
+        for i in range(length - 5):
+            six_tiles = [tile for tile in row[i:i+6]]
+            if opponent(player) not in six_tiles:
+                player_count = six_tiles.count(player)
+                if player_count > max_length:
+                    max_length = player_count
+                    blanks_around = 6 - player_count
+
+    return max_length, blanks_around
+
+def vert_score(board, player):
+
+    max_length, blanks_around = 0, 0
     for i in range(length):
-        row = board[i]
-        in_a_row = 0
-        blanks = 0
+        for j in range(length - 5):
+            blanks = 0
+            player_count = 0
+            for k in range(6):
+                if board[j+k][i] == "-":
+                    blanks += 1
+                elif board[j+k][i] == player:
+                    player_count += 1
+                else:
+                    break
+            if player_count > max_length and blanks + player_count == 6:
+                max_length = player_count
+                blanks_around = blanks         
 
-        for j in row:
-            if j == "-":
-                blanks += 1
-            elif j == player:
-                in_a_row += 1
-            else:
-                in_a_row = 0
-                blanks = 0
+    return max_length, blanks_around
 
-            if in_a_row == 6:
-                return 6, 0
+def up_diag_score(board, player):
+
+    max_length, blanks_around = 0, 0
+    up_diagonals = [[board[p - q][q]
+             for q in range(max(p-length+1,0), min(p+1, length))]
+            for p in range(length + length - 1)]
+    
+    for diagonal in up_diagonals:
+        if len(diagonal) >= 6:
+            for i in range(len(diagonal) - 5):
+                six_tiles = [tile for tile in diagonal[i:i+6]]
+                if opponent(player) not in six_tiles:
+                    player_count = six_tiles.count(player)
+                    if player_count > max_length:
+                        max_length = player_count
+                        blanks_around = 6 - player_count         
             
-            if in_a_row >= max_length:
-                max_length = in_a_row
-                blanks_around = blanks
 
     return max_length, blanks_around
 
-def vert_score(board, player, max_length, blanks_around):
-    for i in range(length):
-        in_a_row = 0
-        blanks = 0
+def down_diag_score(board, player):
 
-        for j in range(length):
-            if board[j][i] == "-":
-                blanks += 1
-            elif board[j][i] == player:
-                in_a_row += 1
-            else:
-                in_a_row = 0
-                blanks = 0
-
-            if in_a_row == 6:
-                return 6, 0
-
-            if in_a_row >= max_length:
-                max_length = in_a_row
-                blanks_around = blanks
+    max_length, blanks_around = 0, 0
+    down_diagonals = [[board[length - p + q - 1][q]
+             for q in range(max(p-length+1, 0), min(p+1, length))]
+            for p in range(length + length - 1)]
+    
+    for diagonal in down_diagonals:
+        if len(diagonal) >= 6:
+            for i in range(len(diagonal) - 5):
+                six_tiles = [tile for tile in diagonal[i:i+6]]
+                if opponent(player) not in six_tiles:
+                    player_count = six_tiles.count(player)
+                    if player_count > max_length:
+                        max_length = player_count
+                        blanks_around = 6 - player_count      
 
     return max_length, blanks_around
 
-def up_diag_score(board, player, max_length, blanks_around):
-
-    for sum in range(length*2-1):
-        #print('Sum', sum)           # Leave this line for debugging
-        in_a_row = 0
-        blanks = 0
-        for j in range(sum+1):
-            i = sum-j
-            if (i<length and j<length):
-                tile = board[i][j]
-                #print(i, j, tile)   # Leave this line for debugging
-                if tile == "-":
-                    blanks += 1
-                elif tile == player:
-                    in_a_row += 1
-                else:
-                    in_a_row = 0
-                    blanks = 0
-
-            if in_a_row == 6:
-                    return 6, 0
-        
-            if in_a_row >= max_length:
-                max_length = in_a_row
-                blanks_around = blanks
-
-    return max_length, blanks_around
-
-def down_diag_score(board, player, max_length, blanks_around):
-
-    for sum in range(length*-1+1, length, 1):
-        #print('Sum', sum)           # Leave this line for debugging
-        in_a_row = 0
-        blanks = 0
-        for j in range(length):
-            i = j-sum
-            if (i>= 0 and i<length and j<length):
-                tile = board[i][j]
-                #print(i, j, tile)   # Leave this line for debugging
-                if tile == "-":
-                    blanks += 1
-                elif tile == player:
-                    in_a_row += 1
-                else:
-                    in_a_row = 0
-                    blanks = 0
-
-            if in_a_row == 6:
-                    return 6, 0
-        
-            if in_a_row >= max_length:
-                max_length = in_a_row
-                blanks_around = blanks
-
-    return max_length, blanks_around
-
-
-def max_score(board, player, max_length, blanks_around):
-    horiz = horiz_score(board, player, max_length, blanks_around)
-    vert = vert_score(board, player, max_length, blanks_around)
+def max_score(board, player):
+    horiz = horiz_score(board, player)
+    vert = vert_score(board, player)
     # bottom left to top right
-    up_diag = up_diag_score(board, player, max_length, blanks_around)
+    up_diag = up_diag_score(board, player)
     # top left to bottom right
-    down_diag = down_diag_score(board, player, max_length, blanks_around)
+    down_diag = down_diag_score(board, player)
 
     max_tuple = horiz
     for a_tuple in [vert, up_diag, down_diag]:
@@ -186,13 +152,13 @@ def max_score(board, player, max_length, blanks_around):
                 max_tuple = a_tuple
     print_board(board)  # for debugging only
     print("MAX SCORE:", max_tuple)
-    return max_tuple
+    return (max_tuple[1] * 2) + max_tuple[1]
 
-def print_all_scores(board, player, max_length, blanks_around):
-    print("UP", up_diag_score(board, player, max_length, blanks_around))
-    print("DOWN", down_diag_score(board, player, max_length, blanks_around))
-    print("Ver", vert_score(board, player, max_length, blanks_around))
-    print("Hor", horiz_score(board, player, max_length, blanks_around))
+def print_all_scores(board, player):
+    print("UP", up_diag_score(board, player))
+    print("DOWN", down_diag_score(board, player))
+    print("Ver", vert_score(board, player))
+    print("Hor", horiz_score(board, player))
 
 def score_util(board, player, max_length, blanks_around):
     util = 0
@@ -262,16 +228,18 @@ best_move_x = 0
 best_move_y = 0
 
 def ab_negamax(board, player, depth, max_depth, alpha, beta):
-    global best_move_x, best_move_y, max_length, blanks_around
+    global best_move_x, best_move_y
 
     # previous move created win
     if win_state(board, "X") or win_state(board, "O") or depth == max_depth:
-        max_length_copy = max_length
-        blanks_around_copy = blanks_around
-        score_util(board, player, max_length, blanks_around)
-        max_tuple = max_score(board, player, max_length_copy, blanks_around_copy)
-        return max_tuple[0] + max_tuple[1]
-    
+        max_score_player = max_score(board, player)
+        max_score_opponent = max_score(board, opponent(player))
+        if max_score_player > max_score_opponent:
+            return -(max_score_player - max_score_opponent)
+        else:
+            return max_score_opponent - max_score_player
+        return max_score_opponent
+
     # board full, tie
     moves = num_valid(board)
     if len(moves) == 0:
@@ -321,7 +289,10 @@ while run:
                     # print(turn)
                     print_board(board)
                     
-                    print_all_scores(board, "X", max_length, blanks_around)
+                    print("AI max scores")
+                    print_all_scores(board, "O")
+                    print("Player max scores")
+                    print_all_scores(board, "X")
                     
         else: #player 2
             # random_move(board)
@@ -335,7 +306,10 @@ while run:
             # print(turn)
             print_board(board)
 
-            print_all_scores(board, "O", max_length, blanks_around)
+            print("AI max scores")
+            print_all_scores(board, "O")
+            print("Player max scores")
+            print_all_scores(board, "X")
 
             if turn >= 3:
                 turn-=4
