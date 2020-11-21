@@ -1,7 +1,26 @@
 import pygame
 import math
+import pygame_menu
 
 pygame.init()
+
+def main_menu():
+    WIN = pygame.display.set_mode((950, 950)) #game window dimensions set
+   
+    def start_the_game_pvp():
+        connect_6()
+    def start_the_game_ai():
+        pass
+    
+    menu = pygame_menu.Menu(950, 950, 'Connect 6',
+                           theme=pygame_menu.themes.THEME_DARK)
+    
+    menu.add_button('Play Against Another Player', start_the_game_pvp)
+    menu.add_button('Play Against An AI', start_the_game_ai)
+    menu.add_button('Quit', pygame_menu.events.EXIT)
+    pygame.display.set_caption('Connect 6')
+    
+    menu.mainloop(WIN)
 
 def connect_6():
     WIN = pygame.display.set_mode((950, 950)) #game window dimensions set
@@ -229,17 +248,27 @@ def connect_6():
         WIN.blit(TextSurf, TextRect)
     
         pygame.display.update()
+        
+    def reminder_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',24)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(600))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
     def game_over_screen():
         if Red:
             WIN.fill((0,0,0))
             winner_message_display("Red is the winner!")
             instruction_message_display("Game will restart in 10 seconds!")
+            reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
             
         if Yellow:
             WIN.fill((0,0,0))
             winner_message_display("Yellow is the winner!")
             instruction_message_display("Game will restart in 10 seconds!")
+            reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
     
     while run:
@@ -252,7 +281,16 @@ def connect_6():
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #when user clicks on the x, terminate program
                 run = False
-            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    print("Quitting registered!")
+                    run = False
+                    pygame.display.quit()
+                    pygame.quit()
+                elif event.key == pygame.K_SPACE:
+                    print("Menu registered!")
+                    main_menu()
+
             if event.type == pygame.MOUSEBUTTONUP:
                 position = pygame.mouse.get_pos() #get click pos coordinate
                 r = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
@@ -298,4 +336,4 @@ def connect_6():
     
     pygame.quit()
 
-connect_6()
+main_menu()
