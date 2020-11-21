@@ -1,6 +1,5 @@
 import pygame
 import math
-import sys
 
 pygame.init()
 
@@ -38,7 +37,6 @@ def connect_6():
             i += 1
     
     run = True
-    game_over = False
     board = initialize_board()
     print_board(board)
     
@@ -251,7 +249,6 @@ def connect_6():
         Red = False
         Yellow = False
             
-    
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #when user clicks on the x, terminate program
                 run = False
