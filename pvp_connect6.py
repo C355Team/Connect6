@@ -209,8 +209,40 @@ def connect_6():
                 if (valid(board, coords[i], coords[j])):
                     valids.append((i, j))
         return valids
+    def text_objects(text, font):
+        if Red:
+            textSurface = font.render(text, True, (255,0,0))
+        if Yellow:
+            textSurface = font.render(text, True, (204,204,0))
+        return textSurface, textSurface.get_rect()
     
-    #def RedWinScreen
+    def winner_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',64)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(400))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
+        
+    def instruction_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',48)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(950/2))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
+    def game_over_screen():
+        if Red:
+            WIN.fill((0,0,0))
+            winner_message_display("Red is the winner!")
+            instruction_message_display("Game will restart in 10 seconds!")
+            pygame.time.delay(10000)
+            
+        if Yellow:
+            WIN.fill((0,0,0))
+            winner_message_display("Yellow is the winner!")
+            instruction_message_display("Game will restart in 10 seconds!")
+            pygame.time.delay(10000)
     
     while run:
         
@@ -218,14 +250,12 @@ def connect_6():
     
         Red = False
         Yellow = False
-        
-        if game_over:
-            #game_over_screen()
-            connect_6()
+            
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #when user clicks on the x, terminate program
                 run = False
+            
             if event.type == pygame.MOUSEBUTTONUP:
                 position = pygame.mouse.get_pos() #get click pos coordinate
                 r = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
@@ -262,10 +292,13 @@ def connect_6():
             pygame.display.update()
         if Red:
             print("Red wins")
-            game_over = True
+            game_over_screen()
+            connect_6()
         elif Yellow:
             print("Yellow wins")
-            game_over = True
+            game_over_screen()
+            connect_6()
     
     pygame.quit()
+
 connect_6()
