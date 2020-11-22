@@ -1,7 +1,7 @@
 import pygame
 import math
 import pygame_menu
-
+import os
 
 pygame.init()
 
@@ -11,7 +11,10 @@ def main_menu():
     def start_the_game_pvp():   
         connect_6_pvp()
     def start_the_game_ai():
-        import AI_connect6.py
+        pygame.display.quit()
+        pygame.quit()
+        os.system('python AI_connect6.py')
+        
     
     menu = pygame_menu.Menu(950, 950, 'Connect 6',
                            theme=pygame_menu.themes.THEME_DARK)
@@ -263,14 +266,14 @@ def connect_6_pvp():
         if Red:
             WIN.fill((0,0,0))
             winner_message_display("Red is the winner!")
-            instruction_message_display("Game will restart in 10 seconds!")
+            instruction_message_display("Game will return to menu in 10 seconds!")
             reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
             
         if Yellow:
             WIN.fill((0,0,0))
             winner_message_display("Yellow is the winner!")
-            instruction_message_display("Game will restart in 10 seconds!")
+            instruction_message_display("Game will return to menu in 10 seconds!")
             reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
     
@@ -331,11 +334,11 @@ def connect_6_pvp():
         if Red:
             print("Red wins")
             game_over_screen()
-            connect_6_pvp()
+            main_menu()
         elif Yellow:
             print("Yellow wins")
             game_over_screen()
-            connect_6_pvp()
+            main_menu()
     
     pygame.quit()
 
