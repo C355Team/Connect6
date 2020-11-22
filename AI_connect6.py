@@ -164,6 +164,7 @@ def print_all_scores(board, player):
     print("DOWN", down_diag_score(board, player))
     print("Ver", vert_score(board, player))
     print("Hor", horiz_score(board, player))
+    print("MAX", max_score(board,player))
     
 # check available moves
 
@@ -231,7 +232,7 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
         v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]])
         
         # if -v max_length > best max_length OR -v multiples at max_length > best multiples at max_length   
-        if -v[0] > best[0] or (-v[0] == best[0] and -v[1] > best[1]): 
+        if -v[0] > best[0] or (-v[0] == best[0] and -v[1] >= best[1]): 
             best_move_x = move[0]
             best_move_y = move[1]
             best = [-v[0], -v[1]]
