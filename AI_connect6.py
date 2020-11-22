@@ -231,15 +231,15 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
         v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]])
         
         # if -v max_length > best max_length OR -v multiples at max_length > best multiples at max_length   
-        if -v[0] > best[0] or -v[0] == best[0] and -v[1] > best[1]: 
+        if -v[0] > best[0] or (-v[0] == best[0] and -v[1] > best[1]): 
             best_move_x = move[0]
             best_move_y = move[1]
             best = [-v[0], -v[1]]
         new_board[move[0]][move[1]] = '-'   # reset board to original
         
-        if best[0] > alpha[0] or best[0] == alpha[0] and best[1] > alpha[1]:
-             alpha = best
-        if alpha[0] > beta[0] or alpha[0] == beta[0] and alpha[1] > beta[1]:
+        if best[0] > alpha[0] or (best[0] == alpha[0] and best[1] > alpha[1]):
+            alpha = best
+        if alpha[0] > beta[0] or (alpha[0] == beta[0] and alpha[1] > beta[1]):
             break
 
     return best
