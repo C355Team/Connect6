@@ -210,7 +210,7 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
         max_score_opponent = max_score(board, opponent(player))
         
         # special case where player has connect4 and AI has connect3, then AI should go for block
-        if max_score_player[0] == 4 and max_score_opponent[0] == 4 and max_score_opponent[0] == max_score_player[0]:
+        if max_score_player[0] == 4 and max_score_opponent[0] == 4:
             max_score_opponent[0] = 0
 
         # if player max_length > opponent max_length OR player multiples at max_length > opponent multiples at max_length
