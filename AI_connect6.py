@@ -1,6 +1,7 @@
 import pygame
 import math
 import sys
+import os
 from random import randrange
 
 pygame.init()
@@ -16,13 +17,11 @@ for x in range(950): #for loop to draw grid
         rect = pygame.Rect(x*blockSize, y*blockSize,
                            blockSize, blockSize)
         pygame.draw.rect(WIN, (0,255,65), rect, 1)
-
+max_length = 0
+blanks_around = 0
 length = 19
 coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
           'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
-
-max_length = 0
-blanks_around = 0
 
 def initialize_board():
     board = []
@@ -294,7 +293,56 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
 
     return best
 
+def text_objects(text, font):
+        if Red:
+            textSurface = font.render(text, True, (255,0,0))
+        if Yellow:
+            textSurface = font.render(text, True, (204,204,0))
+        return textSurface, textSurface.get_rect()
+    
+def winner_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',64)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(400))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
+        
+def instruction_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',48)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(950/2))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
+        
+def reminder_message_display(text):
+        largeText = pygame.font.Font('freesansbold.ttf',24)
+        TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((950/2),(600))
+        WIN.blit(TextSurf, TextRect)
+    
+        pygame.display.update()
+        
+def game_over_screen():
+        if Red:
+            WIN.fill((0,0,0))
+            winner_message_display("Player is the winner!")
+            instruction_message_display("Game will restart in 10 seconds!")
+            reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
+            pygame.time.delay(10000)
+            
+        if Yellow:
+            WIN.fill((0,0,0))
+            winner_message_display("AI is the winner!")
+            instruction_message_display("Game will restart in 10 seconds!")
+            reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
+            pygame.time.delay(10000)
 
+def restart_ai_connect6():
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
+    
 while run:
     
     pygame.time.delay(10) #refresh delay
@@ -305,6 +353,18 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #when user clicks on the x, terminate program
             run = False
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    print("Quitting registered!")
+                    run = False
+                    pygame.display.quit()
+                    pygame.quit()
+                elif event.key == pygame.K_SPACE:
+                    print("Menu registered!")
+                    run = False
+                    pygame.display.quit()
+                    pygame.quit()
+                    import pvp_connect6.py
         if turn <= 0:
             if event.type == pygame.MOUSEBUTTONUP:
                 position = pygame.mouse.get_pos() #get click pos coordinate
@@ -316,7 +376,6 @@ while run:
                     board[c][r] = "X"
                     if win_state(board, "X"):
                         Red = True
-                        break
                     turn+=1
                     # print(turn)
                     print_board(board)
@@ -330,7 +389,6 @@ while run:
             pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0) #yellow tile
             if win_state(board, "O"):
                 Yellow = True
-                break
             turn+=1
             # print(turn)
             print_board(board)
@@ -343,9 +401,11 @@ while run:
         pygame.display.update()
     if Red:
         print("Red wins")
-        break
+        game_over_screen()
+        restart_ai_connect6()
     elif Yellow:
         print("Yellow wins")
-        break
+        game_over_screen()
+        restart_ai_connect6()
 
 pygame.quit()
