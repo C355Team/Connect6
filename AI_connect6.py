@@ -76,7 +76,7 @@ def horiz_score(board, player):
                 elif player_count == max_length:
                     multiples += 1
 
-    return max_length, multiples
+    return [max_length, multiples]
 
 def vert_score(board, player):
 
@@ -94,7 +94,7 @@ def vert_score(board, player):
                 elif player_count == max_length:
                     multiples += 1
 
-    return max_length, multiples
+    return [max_length, multiples]
 
 def up_diag_score(board, player):
 
@@ -115,7 +115,7 @@ def up_diag_score(board, player):
                     elif player_count == max_length:
                         multiples += 1
 
-    return max_length, multiples
+    return [max_length, multiples]
 
 def down_diag_score(board, player):
 
@@ -137,7 +137,7 @@ def down_diag_score(board, player):
                     elif player_count == max_length:
                         multiples += 1
 
-    return max_length, multiples
+    return [max_length, multiples]
 
 def max_score(board, player):
     horiz = horiz_score(board, player)
@@ -209,6 +209,10 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
         max_score_player = max_score(board, player)
         max_score_opponent = max_score(board, opponent(player))
         
+        # special case where player has connect4 and AI has connect3, then AI should go for block
+        if max_score_player[0] == 4 and max_score_opponent[0] == 4 and max_score_opponent[0] == max_score_player[0]:
+            max_score_opponent[0] = 0
+
         # if player max_length > opponent max_length OR player multiples at max_length > opponent multiples at max_length
         if max_score_player[0] > max_score_opponent[0] or (max_score_player[0] == max_score_opponent[0] and max_score_player[1] > max_score_opponent[1]):
             return max_score_player
