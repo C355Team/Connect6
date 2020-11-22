@@ -2,15 +2,16 @@ import pygame
 import math
 import pygame_menu
 
+
 pygame.init()
 
 def main_menu():
     WIN = pygame.display.set_mode((950, 950)) #game window dimensions set
    
-    def start_the_game_pvp():
-        connect_6()
+    def start_the_game_pvp():   
+        connect_6_pvp()
     def start_the_game_ai():
-        pass
+        import AI_connect6.py
     
     menu = pygame_menu.Menu(950, 950, 'Connect 6',
                            theme=pygame_menu.themes.THEME_DARK)
@@ -22,7 +23,7 @@ def main_menu():
     
     menu.mainloop(WIN)
 
-def connect_6():
+def connect_6_pvp():
     WIN = pygame.display.set_mode((950, 950)) #game window dimensions set
     
     pygame.display.set_caption('Connect 6')
@@ -226,6 +227,7 @@ def connect_6():
                 if (valid(board, coords[i], coords[j])):
                     valids.append((i, j))
         return valids
+    
     def text_objects(text, font):
         if Red:
             textSurface = font.render(text, True, (255,0,0))
@@ -256,6 +258,7 @@ def connect_6():
         WIN.blit(TextSurf, TextRect)
     
         pygame.display.update()
+        
     def game_over_screen():
         if Red:
             WIN.fill((0,0,0))
@@ -328,11 +331,11 @@ def connect_6():
         if Red:
             print("Red wins")
             game_over_screen()
-            connect_6()
+            connect_6_pvp()
         elif Yellow:
             print("Yellow wins")
             game_over_screen()
-            connect_6()
+            connect_6_pvp()
     
     pygame.quit()
 
