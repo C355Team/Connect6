@@ -282,20 +282,16 @@ def game_over_screen():
         if Red:
             WIN.fill((0,0,0))
             winner_message_display("Player is the winner!")
-            instruction_message_display("Game will restart in 10 seconds!")
+            instruction_message_display("Game will return to menu in 10 seconds!")
             reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
             
         if Yellow:
             WIN.fill((0,0,0))
             winner_message_display("AI is the winner!")
-            instruction_message_display("Game will restart in 10 seconds!")
+            instruction_message_display("Game will return to menu in 10 seconds!")
             reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
-
-def restart_ai_connect6():
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
     
 while run:
     
@@ -362,10 +358,10 @@ while run:
     if Red:
         print("Red wins")
         game_over_screen()
-        restart_ai_connect6()
+        import pvp_connect6
     elif Yellow:
         print("Yellow wins")
         game_over_screen()
-        restart_ai_connect6()
+        import pvp_connect6
 
 pygame.quit()
