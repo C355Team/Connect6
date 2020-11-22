@@ -257,7 +257,7 @@ def text_objects(text, font):
 def winner_message_display(text):
         largeText = pygame.font.Font('freesansbold.ttf',64)
         TextSurf, TextRect = text_objects(text, largeText)
-        TextRect.center = ((950/2),(400))
+        TextRect.center = ((475),(400))
         WIN.blit(TextSurf, TextRect)
     
         pygame.display.update()
@@ -265,7 +265,7 @@ def winner_message_display(text):
 def instruction_message_display(text):
         largeText = pygame.font.Font('freesansbold.ttf',48)
         TextSurf, TextRect = text_objects(text, largeText)
-        TextRect.center = ((950/2),(950/2))
+        TextRect.center = ((475),(475))
         WIN.blit(TextSurf, TextRect)
     
         pygame.display.update()
@@ -273,7 +273,7 @@ def instruction_message_display(text):
 def reminder_message_display(text):
         largeText = pygame.font.Font('freesansbold.ttf',24)
         TextSurf, TextRect = text_objects(text, largeText)
-        TextRect.center = ((950/2),(600))
+        TextRect.center = ((475),(600))
         WIN.blit(TextSurf, TextRect)
     
         pygame.display.update()
