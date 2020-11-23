@@ -2,8 +2,9 @@
 Assignment 4 Project
 
 This Connect6 program has two modes: 
-    * Player vs Player
-    * Player vs AI (negamax)
+
+- Player vs Player
+- Player vs AI (negamax)
 
 ## To Run
 
