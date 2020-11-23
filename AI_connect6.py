@@ -3,6 +3,7 @@ import math
 import sys
 import os
 import random
+import argparse
 
 pygame.init()
 
@@ -22,6 +23,11 @@ blanks_around = 0
 length = 19
 coords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
           'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-rand', action="store_true", default=False, dest='random_player', help='Use a random player to go against AI')
+parser.add_argument('-ai', action="store_true", default=False, dest='ai_player', help='Use an AI player to go against AI')
+results = parser.parse_args()
 
 def initialize_board():
     board = []
@@ -193,6 +199,10 @@ def opponent(player):
     else:
         return 'X'
 
+def random_move(board):
+    valids = num_valid(board)
+    return valids[random.randrange(len(valids))]
+
 best_move_x = 0
 best_move_y = 0
 
@@ -285,6 +295,24 @@ def game_over_screen():
             instruction_message_display("Game will return to menu in 10 seconds!")
             reminder_message_display("Press Q anytime during gameplay to quit, and space to return to the main menu.")
             pygame.time.delay(10000)
+
+def make_a_move(board):
+    global best_move_x, best_move_y
+    if results.random_player:
+        pygame.time.wait(1000)    
+        return random_move(board)
+    elif event.type == pygame.MOUSEBUTTONUP:
+            position = pygame.mouse.get_pos() #get click pos coordinate
+            c = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
+            r = math.floor(position[1]/50) #translate coordinate from pixel to rows 0-18
+            print ('Coordinate Selected:' + '(' + str(r) + ',' + str(c) + ')') #for diagnostic purposes
+            return r,c
+    return None, None
+
+def ai_move(board, player):
+    global best_move_x, best_move_y
+    ab_negamax(board, player, 0, 1, [-1000, -1000], [1000, 1000])   # board, player, depth, max_depth, alpha, beta
+    return best_move_x, best_move_y
     
 while run:
     
@@ -309,23 +337,24 @@ while run:
                     pygame.quit()
                     import pvp_connect6.py
         if turn <= 0:
-            if event.type == pygame.MOUSEBUTTONUP:
-                position = pygame.mouse.get_pos() #get click pos coordinate
-                r = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
-                c = math.floor(position[1]/50) #translate coordinate from pixel to rows 0-18
-                print ('Coordinate Selected:' + '(' + str(r) + ',' + str(c) + ')') #for diagnostic purposes
-                if ((c, r)) in num_valid(board):       
-                    pygame.draw.rect(WIN, (255,0,0), (r*50,c*50,45,45), 0) #red tile
-                    board[c][r] = "X"
-                    if win_state(board, "X"):
-                        Red = True
-                    turn+=1
-                    print_board(board)
-                    
-                    print("AI max scores")
-                    print_all_scores(board, "O")
-                    print("Player max scores")
-                    print_all_scores(board, "X")
+            if results.ai_player:
+                pygame.time.wait(1000)
+                r, c = ai_move(board, 'X')
+            else:
+                r, c = make_a_move(board.copy())
+            
+            if r != None and ((r, c)) in num_valid(board):       
+                pygame.draw.rect(WIN, (255,0,0), (c*50,r*50,45,45), 0) #red tile
+                board[r][c] = "X"
+                if win_state(board, "X"):
+                    Red = True
+                turn+=1
+                print_board(board)
+                
+                print("AI max scores")
+                print_all_scores(board, "O")
+                print("Player max scores")
+                print_all_scores(board, "X")
                     
         else: #player 2
             ab_negamax(board, 'O', 0, 1, [-1000, -1000], [1000, 1000])   # board, player, depth, max_depth, alpha, beta

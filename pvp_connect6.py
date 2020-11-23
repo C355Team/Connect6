@@ -10,10 +10,11 @@ def main_menu():
    
     def start_the_game_pvp():   
         connect_6_pvp()
-    def start_the_game_ai():
+    def start_the_game_ai(param=''):
         pygame.display.quit()
         pygame.quit()
-        os.system('python AI_connect6.py')
+        command = 'python AI_connect6.py {}'.format(param)
+        os.system(command)
         
     
     menu = pygame_menu.Menu(950, 950, 'Connect 6',
@@ -21,6 +22,8 @@ def main_menu():
     
     menu.add_button('Play Against Another Player', start_the_game_pvp)
     menu.add_button('Play Against An AI', start_the_game_ai)
+    menu.add_button('AI Against Random Player', start_the_game_ai, '-rand')
+    menu.add_button('AI Against AI Player', start_the_game_ai, '-ai')
     menu.add_button('Quit', pygame_menu.events.EXIT)
     pygame.display.set_caption('Connect 6')
     
