@@ -2,7 +2,7 @@ import pygame
 import math
 import sys
 import os
-from random import randrange
+import random
 
 pygame.init()
 
@@ -229,6 +229,7 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
     
     best = [-sys.maxsize, -sys.maxsize]
     new_board = board
+    random.shuffle(moves)
     for move in moves:
         new_board[move[0]][move[1]] = player
         v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]])
