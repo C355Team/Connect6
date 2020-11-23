@@ -2,7 +2,7 @@ import pygame
 import math
 import sys
 import os
-from random import randrange
+import random
 
 pygame.init()
 
@@ -187,14 +187,6 @@ def num_valid(board):
                 valids.append((i, j))
     return valids
 
-def random_move(board):
-    global best_move_x, best_move_y
-
-    valids = num_valid(board)
-    random_move = valids[randrange(len(valids))]
-    best_move_x = random_move[0]
-    best_move_y = random_move[1]
-
 def opponent(player):
     if player == 'X':
         return 'O'
@@ -229,6 +221,7 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
     
     best = [-sys.maxsize, -sys.maxsize]
     new_board = board
+    random.shuffle(moves)
     for move in moves:
         new_board[move[0]][move[1]] = player
         v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]])
@@ -327,7 +320,6 @@ while run:
                     if win_state(board, "X"):
                         Red = True
                     turn+=1
-                    # print(turn)
                     print_board(board)
                     
                     print("AI max scores")
@@ -336,14 +328,12 @@ while run:
                     print_all_scores(board, "X")
                     
         else: #player 2
-            # random_move(board)
             ab_negamax(board, 'O', 0, 1, [-1000, -1000], [1000, 1000])   # board, player, depth, max_depth, alpha, beta
             board[best_move_x][best_move_y] = "O"
             pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0) #yellow tile
             if win_state(board, "O"):
                 Yellow = True
             turn+=1
-            # print(turn)
             print_board(board)
 
             print("AI max scores")
