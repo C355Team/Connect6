@@ -35,3 +35,7 @@ python3 AI_connect6.py -rand
 # AI vs AI
 python3 AI_connect6.py -ai
 ```
+
+## Demo Video
+
+[![Watch the video](demo.png)](https://drive.google.com/file/d/1XFZcxCoZbel-q1nowbzPBr3_L3W06thB/view?usp=sharing)

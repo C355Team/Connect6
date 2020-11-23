@@ -299,8 +299,9 @@ def game_over_screen():
 def make_a_move(board):
     global best_move_x, best_move_y
     if results.random_player:
-        pygame.time.wait(1000)    
-        return random_move(board)
+        r, c = random_move(board)
+        pygame.time.wait(100)    
+        return r, c
     elif event.type == pygame.MOUSEBUTTONUP:
             position = pygame.mouse.get_pos() #get click pos coordinate
             c = math.floor(position[0]/50) #translate coordinate from pixel to columns 0-18
@@ -338,7 +339,6 @@ while run:
                     import pvp_connect6.py
         if turn <= 0:
             if results.ai_player:
-                pygame.time.wait(1000)
                 r, c = ai_move(board, 'X')
             else:
                 r, c = make_a_move(board.copy())
