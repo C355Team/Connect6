@@ -27,11 +27,11 @@ python3 pvp_connect6.py
 
 ```bash
 # Play against an AI
-python3.6 AI_connect6.py
+python3 AI_connect6.py
 
 # Play against a Random Player
-python3.6 AI_connect6.py -rand
+python3 AI_connect6.py -rand
 
 # AI vs AI
-python3.6 AI_connect6.py -ai
+python3 AI_connect6.py -ai
 ```
