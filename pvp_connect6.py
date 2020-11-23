@@ -28,7 +28,7 @@ def main_menu():
 
 def connect_6_pvp():
     WIN = pygame.display.set_mode((950, 950)) #game window dimensions set
-    
+    WIN.fill((0,0,0))
     pygame.display.set_caption('Connect 6')
     
     turn = 0 #turn counter initiated
