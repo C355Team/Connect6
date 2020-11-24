@@ -213,11 +213,11 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta, turn):
         max_score_opponent = max_score(board, opponent(player))
         
         # special case #1: player has connect4 and opponent has connect3, then opponent should go for block
-        # special case #2: player has connect5 and opponent has connect4 while on last turn, then opponent should go for block
+        # special case #2: player has connect4 and opponent has connect4 while on last turn, then opponent should go for block
         # special case #3: player has connect5 and opponent has connect4 while on last turn, then opponent should go for block
         if ((max_score_player[0] == 4 and max_score_opponent[0] == 4) or
             (max_score_player[0] == 4 and max_score_opponent[0] == 5 and turn % 2 == 1) or
-            (max_score_player[0] == 5 and max_score_opponent[0] == 4 and turn % 2 == 1)):
+            (max_score_player[0] == 5 and max_score_opponent[0] == 5 and turn % 2 == 1)):
                 max_score_opponent[0] = 0
 
         # if player max_length > opponent max_length OR player multiples at max_length > opponent multiples at max_length
