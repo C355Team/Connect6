@@ -160,11 +160,8 @@ def max_score(board, player):
         if a_tuple[0]>max_tuple[0]:
             max_tuple = a_tuple
         elif a_tuple[0]==max_tuple[0]:
-            if a_tuple[1]>max_tuple[1]:
-                max_tuple = a_tuple
+            max_tuple[1] += a_tuple[1]
 
-    # print_board(board)  # for debugging only
-    # print("MAX SCORE:", max_tuple)
     return max_tuple
 
 def print_all_scores(board, player):
@@ -172,7 +169,8 @@ def print_all_scores(board, player):
     print("DOWN", down_diag_score(board, player))
     print("Ver", vert_score(board, player))
     print("Hor", horiz_score(board, player))
-    print("MAX", max_score(board,player))
+    score = max_score(board, player)
+    print(f'max_length={score[0]} multiples={score[1]}')
     
 # check available moves
 
@@ -206,7 +204,7 @@ def random_move(board):
 best_move_x = 0
 best_move_y = 0
 
-def ab_negamax(board, player, depth, max_depth, alpha, beta):
+def ab_negamax(board, player, depth, max_depth, alpha, beta, turn):
     global best_move_x, best_move_y
 
     # previous move created win
@@ -214,9 +212,13 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
         max_score_player = max_score(board, player)
         max_score_opponent = max_score(board, opponent(player))
         
-        # special case where player has connect4 and AI has connect3, then AI should go for block
-        if max_score_player[0] == 4 and max_score_opponent[0] == 4:
-            max_score_opponent[0] = 0
+        # special case #1: player has connect4 and opponent has connect3, then opponent should go for block
+        # special case #2: player has connect5 and opponent has connect4 while on last turn, then opponent should go for block
+        # special case #3: player has connect5 and opponent has connect4 while on last turn, then opponent should go for block
+        if ((max_score_player[0] == 4 and max_score_opponent[0] == 4) or
+            (max_score_player[0] == 4 and max_score_opponent[0] == 5 and turn % 2 == 1) or
+            (max_score_player[0] == 5 and max_score_opponent[0] == 4 and turn % 2 == 1)):
+                max_score_opponent[0] = 0
 
         # if player max_length > opponent max_length OR player multiples at max_length > opponent multiples at max_length
         if max_score_player[0] > max_score_opponent[0] or (max_score_player[0] == max_score_opponent[0] and max_score_player[1] > max_score_opponent[1]):
@@ -234,7 +236,7 @@ def ab_negamax(board, player, depth, max_depth, alpha, beta):
     random.shuffle(moves)
     for move in moves:
         new_board[move[0]][move[1]] = player
-        v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]])
+        v = ab_negamax(new_board, opponent(player), depth+1, max_depth, [-alpha[0], -alpha[1]], [-beta[0], -beta[1]], turn+1)
         
         # if -v max_length > best max_length OR -v multiples at max_length > best multiples at max_length   
         if -v[0] > best[0] or (-v[0] == best[0] and -v[1] >= best[1]): 
@@ -357,7 +359,7 @@ while run:
                 print_all_scores(board, "X")
                     
         else: #player 2
-            ab_negamax(board, 'O', 0, 1, [-1000, -1000], [1000, 1000])   # board, player, depth, max_depth, alpha, beta
+            ab_negamax(board, 'O', 0, 1, [-1000, -1000], [1000, 1000], turn)   # board, player, depth, max_depth, alpha, beta, turn
             board[best_move_x][best_move_y] = "O"
             pygame.draw.rect(WIN, (204,204,0),(best_move_y*50,best_move_x*50,45,45), 0) #yellow tile
             if win_state(board, "O"):
