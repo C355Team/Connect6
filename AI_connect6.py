@@ -312,9 +312,9 @@ def make_a_move(board):
             return r,c
     return None, None
 
-def ai_move(board, player):
+def ai_move(board, player, turn):
     global best_move_x, best_move_y
-    ab_negamax(board, player, 0, 1, [-1000, -1000], [1000, 1000])   # board, player, depth, max_depth, alpha, beta
+    ab_negamax(board, player, 0, 1, [-1000, -1000], [1000, 1000], turn)   # board, player, depth, max_depth, alpha, beta
     return best_move_x, best_move_y
     
 while run:
@@ -341,7 +341,7 @@ while run:
                     import pvp_connect6.py
         if turn <= 0:
             if results.ai_player:
-                r, c = ai_move(board, 'X')
+                r, c = ai_move(board, 'X', turn)
             else:
                 r, c = make_a_move(board.copy())
             
