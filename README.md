@@ -39,3 +39,11 @@ python3 AI_connect6.py -ai
 ## Demo Video
 
 [![Watch the video](demo.png)](https://drive.google.com/file/d/1XFZcxCoZbel-q1nowbzPBr3_L3W06thB/view?usp=sharing)
+
+## Sources
+
+**code to help create board game grid**: https://stackoverflow.com/questions/33963361/how-to-make-a-grid-in-pygame 
+
+**starter code for victory screens**: https://pythonprogramming.net/displaying-text-pygame-screen/
+
+**code to get diagonals in a 2-D list**: https://stackoverflow.com/questions/6313308/get-all-the-diagonals-in-a-matrix-list-of-lists-in-python
