@@ -36,9 +36,9 @@ python3 AI_connect6.py -rand
 python3 AI_connect6.py -ai
 ```
 
-## Demo Video
+## Demo Video (Click Picture Below)
 
-[![Watch the video](demo.png)](https://drive.google.com/file/d/1XFZcxCoZbel-q1nowbzPBr3_L3W06thB/view?usp=sharing)
+[![Watch the video](demo.png)](https://youtu.be/UcIjVBOg_1E)
 
 ## Sources
 
